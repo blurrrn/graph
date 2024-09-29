@@ -1,0 +1,9 @@
+directed
+weighted
+A B 1
+B C 2
+C A 3
+D E 4
+E F 5
+F D 6
+G
