@@ -91,22 +91,16 @@ class Graph:
             if self.weighted:
                 file.write("weighted\n")
 
-            est = set()
-
             for u, edges in self.adj_list.items():
 
                 if not edges:
                     file.write(f"{u}\n")
                 else:
                     for v, weight in (edges.items() if self.weighted else [(v, None) for v in edges]):
-
-                        if (u, v) not in est and (v, u) not in est:
-                            if weight is not None:
-                                file.write(f"{u} {v} {weight}\n")
-                            else:
-                                file.write(f"{u} {v}\n")
-
-                            est.add((u, v))
+                        if weight is not None:
+                            file.write(f"{u} {v} {weight}\n")
+                        else:
+                            file.write(f"{u} {v}\n")
 
         # отображение графа пользовател.
     def display(self):
@@ -115,6 +109,24 @@ class Graph:
                 print(f"{versh}: {', '.join(f'{v}({w})' for v, w in edges.items())}")
             else:
                 print(f"{versh}: {', '.join(edges)}")
+
+    def LA2(self, versh):
+        if self.directed:
+            if versh not in self.adj_list:
+                print(f"Вершина '{versh}' не найдена в графе.")
+                return
+            in_degrees = {v: 0 for v in self.adj_list}
+            for u ,edges in self.adj_list.items():
+                for v in edges:
+                    in_degrees[v] += 1
+            target_in_degree = in_degrees[versh]
+            if target_in_degree == 0:
+                print("Полустепень захода заданной вершины равно нулю.")
+            else:
+                result = [v for v, degree in in_degrees.items() if degree < target_in_degree]
+                print(f"Вершины с меньшей полустепенью захода, чем у вершины {versh}: {', '.join(result)}")
+        else:
+            print(f"Граф не ориентированный.")
 
 # консольный интерфейс
 def main():
@@ -128,7 +140,8 @@ def main():
         print("5 - Показать граф")
         print("6 - Сохранить в файл")
         print("7 - Загрузить из файла")
-        print("8 - Выйти")
+        print("8 - Задание на полустепень захода")
+        print("9 - Выйти")
 
         choice = input("Введите ваш выбор: ")
 
@@ -156,6 +169,9 @@ def main():
             filename = input("Введите имя файла для загрузки: ")
             graph = Graph.from_file(filename)
         elif choice == '8':
+            versh = input('Введите вершину: ')
+            graph.LA2(versh)
+        elif choice == '9':
             break
         else:
             print("Неверный выбор. Пожалуйста, попробуйте снова.")
