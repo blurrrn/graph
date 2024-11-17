@@ -35,12 +35,9 @@ def find_all_paths(graph, start, end):
     dfs(graph, start, end, [], paths)
     return paths
 
-# Пример использования
-file_path = 'graph.txt'  # Путь к файлу с графом
 graph = read_graph_from_file('input.txt')
 
 if graph is not None:
-    # Ввод начальной и конечной вершин с клавиатуры
     start_vertex = input("Введите начальную вершину: ")
     end_vertex = input("Введите конечную вершину: ")
 
