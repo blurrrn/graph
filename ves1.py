@@ -11,7 +11,7 @@ def read_graph_from_file(file_path):
             if end not in graph:
                 graph[end] = {}
             graph[start][end] = weight
-            graph[end][start] = weight  # Если граф неориентированный
+            graph[end][start] = weight
     return graph
 
 def dijkstra(graph, start, end):
@@ -49,12 +49,10 @@ def dijkstra(graph, start, end):
     else:
         return path, distances[end]
 
-# Пример использования
-file_path = 'graph.txt'  # Путь к файлу с графом
-graph = read_graph_from_file(file_path)
+graph = read_graph_from_file('input.txt')
 
-start_vertex = 'A'
-end_vertex = 'D'
+start_vertex = input("Введите началбную вершину: ")
+end_vertex = input("Введите конечную вершину: ")
 
 path, distance = dijkstra(graph, start_vertex, end_vertex)
 print(f"Кратчайший путь: {path}")
