@@ -56,7 +56,7 @@ def bellman_ford(graph, start):
     previous_vertices = {vertex: None for vertex in graph}
 
     #релаксация ребер
-    for _ in range(len(graph) - 1):
+    for i in range(len(graph) - 1):
         for u in graph:
             for v, weight in graph[u].items():
                 if distance[u] + weight < distance[v]:
