@@ -1,62 +1,70 @@
-def kruskal(edges, num_vertices):
-    # Сортируем ребра по весу
-    edges = sorted(edges, key=lambda item: item[2])
+class Graph:
+    def __init__(self, weighted=True):
+        self.weighted = weighted
+        self.adjacency_list = {}
+        self.weights = {}
 
-    # Инициализируем родительские узлы и ранги
-    parent = list(range(num_vertices))
-    rank = [0] * num_vertices
+    def load_from_file(self, file_path):
+        with open(file_path, 'r') as file:
+            for line in file:
+                u, v, weight = line.strip().split()
+                weight = int(weight)
+                if u not in self.adjacency_list:
+                    self.adjacency_list[u] = []
+                if v not in self.adjacency_list:
+                    self.adjacency_list[v] = []
+                self.adjacency_list[u].append(v)
+                self.adjacency_list[v].append(u)
+                self.weights[(u, v)] = weight
+                self.weights[(v, u)] = weight
 
-    mst = []
-    i = 0
-    e = 0
+    def find_minimal_spanning_tree_kruskal(self):
+        if not self.weighted:
+            print("Граф не взвешенный. Алгоритм Краскала применим только к взвешенным графам.")
+            return None
 
-    while e < num_vertices - 1:
-        u, v, w = edges[i]
-        i += 1
+        mst_edges = []  # список ребер составляющий мин остов дерево
+        total_weight = 0  # общий вес дерева
 
-        # Находим корни узлов u и v
-        x = u
-        while parent[x] != x:
-            x = parent[x]
+        edges = sorted(self.weights.items(), key=lambda x: x[1])  # сортируем ребра по возрастанию веса
 
-        y = v
-        while parent[y] != y:
-            y = parent[y]
+        parent = {node: node for node in self.adjacency_list}  # словарь родителей (изначально каждый узел сам себе предок)
+        rank = {node: 0 for node in self.adjacency_list}  # уровень узла (изначально каждый узел корень своего дерева (уровень 0))
 
-        # Если корни разные, объединяем их
-        if x != y:
-            e += 1
-            mst.append([u, v, w])
+        def find(node):  # метод для поиска корневого предка узла
+            if parent[node] != node:
+                parent[node] = find(parent[node])  # рекурсивно вызываем
+            return parent[node]
 
-            # Объединяем множества
-            if rank[x] < rank[y]:
-                parent[x] = y
-            elif rank[x] > rank[y]:
-                parent[y] = x
-            else:
-                parent[y] = x
-                rank[x] += 1
+        def union(node1, node2):  # метод для объединения двух поддеревьев
+            root1 = find(node1)  # ищем предка первого узла
+            root2 = find(node2)  # ищем предка второго узла
+            if root1 != root2:  # если предки не совпали сравниванием уровень чтобы сохранить баланс
+                if rank[root1] > rank[root2]:
+                    parent[root2] = root1
+                elif rank[root1] < rank[root2]:
+                    parent[root1] = root2
+                else:
+                    parent[root2] = root1
+                    rank[root1] += 1
 
-    return mst
+        for (u, v), weight in edges:  # идем по всем ребрам в порядке возрастания весов
+            if find(u) != find(v):  # если у узлов не один и тот же предок, то есть нет цикла
+                union(u, v)  # объединяем их в поддерево
+                mst_edges.append((u, v, weight))  # добавляем в результат
+                total_weight += weight  # добавляем весь вес дерева
 
-def read_graph_from_file(file_path):
-    with open(file_path, 'r') as file:
-        num_vertices = int(file.readline().strip())
-        num_edges = int(file.readline().strip())
-        edges = []
-        for _ in range(num_edges):
-            u, v, w = map(int, file.readline().strip().split())
-            edges.append([u, v, w])
-    return num_vertices, edges
+                if len(mst_edges) == len(self.adjacency_list) - 1:  # если добавлены все узлы (значит ребер n - 1)
+                    # можно закончить цикл
+                    break
 
-def main():
-    file_path = 'graph.txt'  # Замените на путь к вашему файлу
-    num_vertices, edges = read_graph_from_file(file_path)
-    mst = kruskal(edges, num_vertices)
+        print("Минимальный остовный каркас:")
+        for u, v, weight in mst_edges:
+            print(f"{u} - {v} : {weight}")
+        print(f"Общий вес каркаса: {total_weight}")
 
-    print("Ребра минимального остовного дерева:")
-    for u, v, weight in mst:
-        print(f"{u} -- {v} == {weight}")
+        return mst_edges, total_weight
 
-if __name__ == "__main__":
-    main()
+graph = Graph()
+graph.load_from_file('input.txt')
+mst_edges, total_weight = graph.find_minimal_spanning_tree_kruskal()
