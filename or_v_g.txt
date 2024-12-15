@@ -1,0 +1,7 @@
+Directed
+Yes
+A B 3
+A C 5
+B D 2
+C D 8
+D E 6

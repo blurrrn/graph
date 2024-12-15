@@ -1,0 +1,9 @@
+Undirected
+Yes
+A B 4
+A C 6
+B D 3
+C D 7
+D E 5
+E F 2
+F G 1
